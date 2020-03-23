@@ -17,6 +17,10 @@ namespace qiyubrother
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
         private static extern void OutputDebugString(string message);
 
+        /// <summary>
+        /// 控制台输出字符串
+        /// </summary>
+        /// <param name="message"></param>
         public static void PrintMessage(string message)
         {
             var s = $"[{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff")}]{message}";
@@ -39,7 +43,7 @@ namespace qiyubrother
             _enable = false;
         }
         /// <summary>
-        /// 记录日志
+        /// 记录日志（保存到文件，同时调用OutputDebugString）
         /// </summary>
         /// <param name="s"></param>
         /// <param name="param"></param>
