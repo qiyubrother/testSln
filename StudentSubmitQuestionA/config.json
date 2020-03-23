@@ -1,0 +1,10 @@
+﻿{
+  "LOGIN_IP": "192.168.10.168",
+  "LOGIN_PORT": "8003",
+  "PRECLASS_SERVER_URL": "http://192.168.10.168:8081/ws/IEasySecServer?wsdl",
+  "PASSWORD": "123456", /* 默认登录密码 */
+  "TIME_TABLE_ID": "a5bfa78bb97844c999ff99a9e5cf6995", /* 课表ID */
+  "COURSE_ID": "f441cb26f5c24ac98d907b2cd7b1e9e0", /* 课程ID (teachingPlanId) */
+  "RESOURCE_ID": "0c721fd5-d601-4662-8b34-6720786aa1f0", /* 问题的资源ID */
+  "STUDENT_FILE_NAME": "StudentOne.txt" /* 学生清单文件，学生越多并发度越高 StudentOne.txt 用于调试，Student.txt 用于高并发测试 */
+}
