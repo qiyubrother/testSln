@@ -26,18 +26,23 @@ namespace ConsoleImportData01
                 using (var conn = new MySqlConnection($"server=192.168.10.168;database=zntbkt_db_nlts;PORT=3306; uid=root;pwd=kjhzzx12+ES;charset=gb2312"))
                 {
                     conn.Open();
+
+                    var ada = new MySqlDataAdapter($"SELECT ACCOUNTID FROM zntbkt_db_nlts.T_EDGE_SYS_ACCOUNT where ssbj = '9e5ddf50722146479303b85b5a937cc6'", conn);
+                    var dt = new DataTable();
+                    ada.Fill(dt);
+
                     var r = new Random((int)DateTime.Now.ToFileTimeUtc());
                     var f = r.Next(0, 10);
                     //var t = r.Next(f, 10 + r.Next(0, 10));
                     //var s = string.Format(sql, f, t);
                     //var ada = new MySqlDataAdapter(s, conn);
-                    var Total = 50000;
+                    var Total = dt.Rows.Count;
                     for(var i = 0; i < Total; i++)
                     {
                         Console.WriteLine($"{i}/{Total}");
                         var sql = $"insert into t_learner_answer(Learner_ID, Resource_ID, U_School, Status, Learner_Score, ErrorNo, Subjective_ErrorNo, AnswerList, AnswerURL, ReviewURL, AnswerFile, AnswerPreviewFile, AnswerFileName, AnswerFileSize, AnswerFileSuffix, AnswerFileType, Comment, CreateUID, CreateTime, UpdateUID, UpdateTime, TIME_TABLE_ID) values (@Learner_ID, @Resource_ID, @U_School, @Status, @Learner_Score, @ErrorNo, @Subjective_ErrorNo, @AnswerList, @AnswerURL, @ReviewURL, @AnswerFile, @AnswerPreviewFile, @AnswerFileName, @AnswerFileSize, @AnswerFileSuffix, @AnswerFileType, @Comment, @CreateUID, @CreateTime, @UpdateUID, @UpdateTime, @TIME_TABLE_ID)"; 
                         var cmd = new MySqlCommand(sql, conn);
-                        var Learner_ID = Guid.NewGuid().ToString();
+                        var Learner_ID = dt.Rows[i]["ACCOUNTID"].ToString();
                         var Resource_ID = "beeef9c9-3536-44ad-8fec-a99f88be2e71";
                         var U_School = "qinghua";
                         var Status = r.Next(1, 2).ToString();
