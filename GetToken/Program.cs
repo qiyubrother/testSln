@@ -24,13 +24,13 @@ namespace GetToken
             var ip = "192.168.10.168";
             var port = "8003";
             var pwd = TokenHelper.Md5("123456");
-            // var len = accounts.Length; // 最大并发度
-            var len = 50; // 最大并发度
+            var len = 500; // 最大并发度
+            var timeout = 60; // 最长等待响应时间（秒）
             var taskList = new Task[len];
             for (var i = 0; i < len; i++)
             {
                 int k = i;
-                taskList[i] = new Task(() => TokenHelper.GetToken(ip, port, accounts[k], pwd));
+                taskList[i] = new Task(() => TokenHelper.GetToken(ip, port, accounts[k], pwd, timeout));
             }
             for (var j = 0; j < len; j++)
             {

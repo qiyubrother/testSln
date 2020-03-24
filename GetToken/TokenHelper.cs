@@ -14,10 +14,10 @@ namespace qiyubrother
 {
     public class TokenHelper
     {
-        public static string GetToken(string ip, string port, string account, string pwd)
+        public static string GetToken(string ip, string port, string account, string pwd, int timeout = 10)
         {
             GetCode(ip, port, account, pwd, out string code, out string state);
-            return code == string.Empty ? string.Empty : GetToken(ip, port, account, code, state, "authorization_code");
+            return code == string.Empty ? string.Empty : GetToken(ip, port, account, code, state, "authorization_code", timeout);
         }
 
         private static void GetCode(string ip, string port, string account, string pwd, out string code, out string state)
@@ -54,8 +54,18 @@ namespace qiyubrother
                 state = string.Empty;
             }
         }
-
-        private static string GetToken(string ip, string port, string account, string code, string state, string grantType)
+        /// <summary>
+        /// 通过Code+State获取AccessToken
+        /// </summary>
+        /// <param name="ip"></param>
+        /// <param name="port"></param>
+        /// <param name="account"></param>
+        /// <param name="code"></param>
+        /// <param name="state"></param>
+        /// <param name="grantType"></param>
+        /// <param name="timeout">最长等待响应时间</param>
+        /// <returns></returns>
+        private static string GetToken(string ip, string port, string account, string code, string state, string grantType, int timeout)
         {
             string client_secret = "111";
             string baseUrl = "http://" + ip + ":" + port;
@@ -64,7 +74,7 @@ namespace qiyubrother
 
             using (HttpClient httpClient = new HttpClient())
             {
-                int timout_sec = 30; // 最长等待时间（秒）
+                int timout_sec = timeout; // 最长等待时间（秒）
                 httpClient.Timeout = TimeSpan.FromSeconds(timout_sec);
                 var refreshToken = string.Empty;
                 var param = new Dictionary<string, string>()
