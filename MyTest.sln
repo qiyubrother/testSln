@@ -27,6 +27,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StudentLoginTest", "Student
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StudentCheckin", "StudentCheckin", "{1F4534CF-4AD9-46C4-B535-1DB93D2C8AA1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudentLoginTest", "StudentLoginTest\StudentLoginTest.csproj", "{E367CAFE-57DE-4079-967F-FFFDAEB5E53F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,14 +71,18 @@ Global
 		{55165D48-F54D-486E-843F-9777BEDD302B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{55165D48-F54D-486E-843F-9777BEDD302B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{55165D48-F54D-486E-843F-9777BEDD302B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E367CAFE-57DE-4079-967F-FFFDAEB5E53F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E367CAFE-57DE-4079-967F-FFFDAEB5E53F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E367CAFE-57DE-4079-967F-FFFDAEB5E53F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E367CAFE-57DE-4079-967F-FFFDAEB5E53F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{50FFB35F-703E-4AFC-9AEC-FD2A55F2211F} = {205B2078-4A6A-4588-9163-F6EED1A19052}
 		{205B2078-4A6A-4588-9163-F6EED1A19052} = {14395DA6-6F4D-463C-BB2C-3662AEE23CCB}
 		{1F4534CF-4AD9-46C4-B535-1DB93D2C8AA1} = {14395DA6-6F4D-463C-BB2C-3662AEE23CCB}
+		{E367CAFE-57DE-4079-967F-FFFDAEB5E53F} = {205B2078-4A6A-4588-9163-F6EED1A19052}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A3302128-7F76-4B36-9C49-5E742B24D69B}

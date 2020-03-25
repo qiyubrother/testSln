@@ -14,22 +14,24 @@ namespace qiyubrother
 {
     public class TokenHelper
     {
-        public static string GetToken(string ip, string port, string account, string pwd, int timeout = 10)
+        public static string GetToken(string ip, string port, string account, string pwd, int timeout = 10, object tag = null)
         {
-            GetCode(ip, port, account, pwd, out string code, out string state);
-            return code == string.Empty ? string.Empty : GetToken(ip, port, account, code, state, "authorization_code", timeout);
+            LogHelper.Trace($"[B]Account:{account}, Tag:{tag}");
+            GetCode(ip, port, account, pwd, out string code, out string state, tag);
+            var rtn = code == string.Empty ? string.Empty : GetToken(ip, port, account, code, state, "authorization_code", timeout, tag);
+            LogHelper.Trace($"[E]Account:{account}, Tag:{tag}, AccessToken:{rtn}");
+
+            return rtn;
         }
 
-        private static void GetCode(string ip, string port, string account, string pwd, out string code, out string state)
+        private static void GetCode(string ip, string port, string account, string pwd, out string code, out string state, object tag)
         {
             var s = string.Empty;
             try
             {
                 var url = $"http://{ip}:{port}/oauth2/login.html?client_id=1&response_type=code&username={account}&password={pwd}";
-                LogHelper.Trace($"GetCode...");
                 s = HttpPost(url, string.Empty);
                 JObject jo = (JObject)JsonConvert.DeserializeObject(s);
-                LogHelper.Trace($"[RTN]String={s}");
                 if (jo["msgCode"].ToString() == "200")
                 {
                     code = jo["code"].ToString();
@@ -39,17 +41,30 @@ namespace qiyubrother
                 {
                     code = string.Empty;
                     state = string.Empty;
+                    LogHelper.Trace($"[Tag:{tag}][GetCode] failed. Return Message:{s}");
                 }
             }
             catch(NullReferenceException nfe)
             {
-                LogHelper.Trace($"[GetToken][NullReferenceException]:{nfe.InnerException}");
+                LogHelper.Trace($"[Tag:{tag}][GetCode][NullReferenceException]:{nfe.InnerException}");
                 code = string.Empty;
                 state = string.Empty;
             }
-            catch(Exception ex)
+            catch (WebException we)
             {
-                LogHelper.Trace($"[GetCode][{ex.GetType()}]:{ex.Message}");
+                LogHelper.Trace($"[Tag:{tag}][GetCode][WebException]:{we.Message}");
+                code = string.Empty;
+                state = string.Empty;
+            }
+            catch (IOException ioe)
+            {
+                LogHelper.Trace($"[Tag:{tag}][GetCode][IOException]:{ioe.Message}, {ioe.InnerException}");
+                code = string.Empty;
+                state = string.Empty;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Trace($"[Tag:{tag}][GetCode][{ex.GetType()}]:{ex.Message}");
                 code = string.Empty;
                 state = string.Empty;
             }
@@ -65,12 +80,12 @@ namespace qiyubrother
         /// <param name="grantType"></param>
         /// <param name="timeout">最长等待响应时间</param>
         /// <returns></returns>
-        private static string GetToken(string ip, string port, string account, string code, string state, string grantType, int timeout)
+        private static string GetToken(string ip, string port, string account, string code, string state, string grantType, int timeout, object tag)
         {
             string client_secret = "111";
             string baseUrl = "http://" + ip + ":" + port;
-            String tokenUrl = baseUrl + "/oauth2/token";
-            String redirect_uri = baseUrl + "/oauth2/getToken.do";
+            string tokenUrl = baseUrl + "/oauth2/token";
+            string redirect_uri = baseUrl + "/oauth2/getToken.do";
 
             using (HttpClient httpClient = new HttpClient())
             {
@@ -89,7 +104,6 @@ namespace qiyubrother
                     {"grant_type",grantType}
                 };
                 var httpContent = new FormUrlEncodedContent(param);
-                LogHelper.Trace($"GetToken...");
                 try
                 {
                     var response = httpClient.PostAsync(tokenUrl, httpContent).Result;
@@ -98,26 +112,26 @@ namespace qiyubrother
 
                     JObject jot = (JObject)JsonConvert.DeserializeObject(responseValue);
                     string err_code = jot["err_code"].ToString();
-                    LogHelper.Trace($"[RTN]err_code={err_code}");
+                    //LogHelper.Trace($"[RTN]err_code={err_code}");
                     if (err_code == "200")
                     {
-                        LogHelper.Trace($"access_token:{jot["access_token"]}...");
+                        //LogHelper.Trace($"access_token:{jot["access_token"]}...");
                         return jot["access_token"].ToString();
                     }
                     else
                     {
-                        LogHelper.Trace($"[getToken]err_code:{err_code}");
+                        LogHelper.Trace($"[Tag:{tag}][GetToken]err_code:{err_code}");
                         return string.Empty;
                     }
                 }
                 catch (AggregateException ae)
                 {
-                    LogHelper.Trace($"[GetToken][AggregateException][响应超时导致的请求任务取消]:{ae.InnerException}");
+                    LogHelper.Trace($"[Tag:{tag}][GetToken][AggregateException][响应超时导致的请求任务取消]:{ae.InnerException}");
                     return string.Empty;
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Trace($"[GetToken][{ex.GetType()}]:{ex.Message}");
+                    LogHelper.Trace($"[Tag:{tag}][GetToken][{ex.GetType()}]:{ex.Message}");
                     return string.Empty;
                 }
             }
@@ -147,7 +161,7 @@ namespace qiyubrother
         //POST方法
         public static string HttpPost(string Url, string postDataStr)
         {
-            try
+            //try
             {
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url);
                 request.Method = "POST";
@@ -167,21 +181,21 @@ namespace qiyubrother
 
                 return retString;
             }
-            catch (System.Net.WebException we)
-            {
-                qiyubrother.LogHelper.Trace($"WebException::{we.Message}");
-                return string.Empty;
-            }
-            catch (System.IO.IOException ioe)
-            {
-                qiyubrother.LogHelper.Trace($"IOException::{ioe.Message}, {ioe.InnerException}");
-                return string.Empty;
-            }
-            catch (Exception ex)
-            {
-                qiyubrother.LogHelper.Trace($"Exception::{ex.Message}, Type::{ex.GetType()}");
-                return string.Empty;
-            }
+            //catch (System.Net.WebException we)
+            //{
+            //    qiyubrother.LogHelper.Trace($"WebException::{we.Message}");
+            //    return string.Empty;
+            //}
+            //catch (System.IO.IOException ioe)
+            //{
+            //    qiyubrother.LogHelper.Trace($"IOException::{ioe.Message}, {ioe.InnerException}");
+            //    return string.Empty;
+            //}
+            //catch (Exception ex)
+            //{
+            //    qiyubrother.LogHelper.Trace($"Exception::{ex.Message}, Type::{ex.GetType()}");
+            //    return string.Empty;
+            //}
         }
     }
 }
