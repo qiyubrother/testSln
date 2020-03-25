@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using qiyubrother;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
+using fastJSON;
 namespace SoftwareUpgrade
 {
     class Program

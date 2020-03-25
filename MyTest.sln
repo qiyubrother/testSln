@@ -21,6 +21,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleImportData01", "Cons
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleImportData02", "ConsoleImportData02\ConsoleImportData02.csproj", "{55165D48-F54D-486E-843F-9777BEDD302B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ConcurrentTest", "ConcurrentTest", "{14395DA6-6F4D-463C-BB2C-3662AEE23CCB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StudentLoginTest", "StudentLoginTest", "{205B2078-4A6A-4588-9163-F6EED1A19052}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StudentCheckin", "StudentCheckin", "{1F4534CF-4AD9-46C4-B535-1DB93D2C8AA1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -66,6 +72,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{50FFB35F-703E-4AFC-9AEC-FD2A55F2211F} = {205B2078-4A6A-4588-9163-F6EED1A19052}
+		{205B2078-4A6A-4588-9163-F6EED1A19052} = {14395DA6-6F4D-463C-BB2C-3662AEE23CCB}
+		{1F4534CF-4AD9-46C4-B535-1DB93D2C8AA1} = {14395DA6-6F4D-463C-BB2C-3662AEE23CCB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A3302128-7F76-4B36-9C49-5E742B24D69B}
