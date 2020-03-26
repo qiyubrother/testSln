@@ -11,5 +11,8 @@
   "MQIP": "mq.s-learning.cn", /* MQ IP */
   "MQPORT": "5671", /* MQ PORT */
   "MQUSERNAME": "guest", /* MQ USER NAME */
-  "MQPASSWORD": "guest" /* MQ PASSWORD */
+  "MQPASSWORD": "guest", /* MQ PASSWORD */
+  "TEACHINGPLANID": "xxx-yyy", /* 授课计划ID */
+  "RESOURCEID": "III-UUU-YXE-X100", /* 资源ID */
+  "SERVEREXCHANGENAME": "server-topic-exchange" /* exchange server name */
 }

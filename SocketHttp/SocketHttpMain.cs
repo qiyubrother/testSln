@@ -31,13 +31,15 @@ namespace SocketHttp
             var timeTableId = jo["TIMETABLEID"].ToString();
             var classId = jo["CLASSID"].ToString();
             var accounts = File.ReadAllLines(Path.Combine(Environment.CurrentDirectory, accountFile));
-
+            var teachingPlanId = jo["TEACHINGPLANID"].ToString();
+            var resourceId = jo["RESOURCEID"].ToString();
             var mqIp = jo["MQIP"].ToString();
             var mqPort = jo["MQPORT"].ToString();
             var mqUserName = jo["MQUSERNAME"].ToString();
             var mqPassword = jo["MQPASSWORD"].ToString();
+            var serverExchangeName = jo["SERVEREXCHANGENAME"].ToString();
+            var maxDegreeOfParallelism = Convert.ToInt32(jo["MaxDegreeOfParallelism"].ToString());
             MQHelper.CreateMqConnection(mqIp, mqPort, mqUserName, mqPassword);
-
             ConcurrentDictionary<string, string> cd = new ConcurrentDictionary<string, string>();
             BlockingCollection<MData> bc = new BlockingCollection<MData>();
 
@@ -111,16 +113,18 @@ namespace SocketHttp
                     }
                 });
             }
+            Console.WriteLine($"[{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff")}]开始获取Code、AccessToken...");
             taskList.ToList().ForEach(a => a.Start());
 
             Task.WaitAll(taskList, 1000 * 60 * 10); // 最长等待10分钟
 
+            #region 并发测试MQ(考勤)
             var bcTaskList = bc.ToList();
-            var mqTask = new Task[bcTaskList.Count];
+            var mqKaoQinTask = new Task[bcTaskList.Count];
             for (var i = 0; i < bcTaskList.Count; i++)
             {
                 var k = i;
-                mqTask[i] = new Task(() => {
+                mqKaoQinTask[i] = new Task(() => {
                     var a = bcTaskList[k];
                     var jObj = new JObject();
                     jObj.Add(new JProperty("studentAccountId", a.AccountId));
@@ -135,11 +139,67 @@ namespace SocketHttp
                     MQHelper.sentMsgToMQqueue("checkwork", jsonPostData);
                 });
             };
-            Console.WriteLine($"[{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff")}]开始并发测试MQ...");
-            mqTask.ToList().ForEach(a => a.Start());
+            Console.WriteLine($"[{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff")}]开始并发测试MQ（考勤）...");
+            mqKaoQinTask.ToList().ForEach(a => a.Start());
+            // 设置最大并行度
+            //Parallel.For(0, mqKaoQinTask.Length, new ParallelOptions { MaxDegreeOfParallelism = 8 }, i => { mqKaoQinTask[i].Start(); });
 
-            Task.WaitAll(taskList, 1000 * 60 * 5); // 最长等待5分钟
+            Task.WaitAll(mqKaoQinTask, 1000 * 60 * 5); // 最长等待5分钟
+            #endregion
 
+            #region 并发测试MQ(举手发言)
+            var mqJuShouFaYanTask = new Task[bcTaskList.Count];
+            for (var i = 0; i < bcTaskList.Count; i++)
+            {
+                var k = i;
+                mqJuShouFaYanTask[i] = new Task(() => {
+                    var a = bcTaskList[k];
+                    var jObj = new JObject();
+
+                    jObj.Add(new JProperty("Course_ID", teachingPlanId));
+                    jObj.Add(new JProperty("Time_Table_ID", a.TimeTableId));
+                    jObj.Add(new JProperty("Account_ID", a.AccountId));
+                    jObj.Add(new JProperty("accessToken", a.AccessToken));
+
+                    var jsonPostData = jObj.ToString();
+                    LogHelper.OutputDebugString($"MQ::{jsonPostData}");
+                    MQHelper.sentMsgToMQqueue("student_speak", jObj.ToString());
+                });
+            };
+            Console.WriteLine($"[{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff")}]开始并发测试MQ（举手发言）...");
+            mqJuShouFaYanTask.ToList().ForEach(a => a.Start());
+
+            Task.WaitAll(mqJuShouFaYanTask, 1000 * 60 * 5); // 最长等待5分钟
+            #endregion
+
+            #region 并发测试MQ（回答问题）
+            var mqHuiDaWenTiTask = new Task[bcTaskList.Count];
+            for (var i = 0; i < bcTaskList.Count; i++)
+            {
+                var k = i;
+                mqHuiDaWenTiTask[i] = new Task(() => {
+                    var a = bcTaskList[k];
+                    var jObj = new JObject();
+
+                    jObj.Add(new JProperty("Time_Table_ID", a.TimeTableId));
+                    jObj.Add(new JProperty("Resource_ID", resourceId));
+                    jObj.Add(new JProperty("Course_ID", teachingPlanId));
+                    jObj.Add(new JProperty("Account_ID", a.AccountId));
+                    jObj.Add(new JProperty("Answer_Time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")));
+                    jObj.Add(new JProperty("type", "1"));
+                    jObj.Add(new JProperty("accessToken", a.AccessToken));
+
+                    var jsonPostData = jObj.ToString();
+                    LogHelper.OutputDebugString($"MQ::{jsonPostData}");
+                    string routingKey = "tea.question.courseId." + a.TimeTableId;
+                    MQHelper.sentMsgToMQ(routingKey, jsonPostData, serverExchangeName);
+                });
+            };
+            Console.WriteLine($"[{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff")}]开始并发测试MQ（回答问题）...");
+            mqHuiDaWenTiTask.ToList().ForEach(a => a.Start());
+
+            Task.WaitAll(mqHuiDaWenTiTask, 1000 * 60 * 5); // 最长等待5分钟
+            #endregion
             var s = $"{startDateTime} - [{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff")}], Concurrent:{concurrent}, MQ-Concurrent:{taskList.Length}. Task finished. Press enter to exit.";
             LogHelper.OutputDebugString(s);
             Console.WriteLine(s);

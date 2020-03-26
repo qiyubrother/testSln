@@ -60,5 +60,24 @@ namespace qiyubrother
                 LogHelper.Trace($"sentMsgToMQque failed.{ex.Message},{ex.StackTrace},{ex.Source}");
             }
         }
+
+        public static void sentMsgToMQ(string routingKey, string msg, string serverExchangeName)
+        {
+            try
+            {
+                IModel channel = connection.CreateModel();
+                // 生成随机队列名称
+                var queueName = channel.QueueDeclare().QueueName;
+                //使用topic exchange type，指定exchange名称
+                channel.ExchangeDeclare(exchange: serverExchangeName, type: "topic");
+                var body = Encoding.UTF8.GetBytes(msg);
+                LogHelper.Trace($"发送MQ消息:{serverExchangeName}:{routingKey}>>>\n{msg}");
+                channel.BasicPublish(exchange: serverExchangeName, routingKey: routingKey, basicProperties: null, body: body);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Trace($"sentMsgToMQque:{ex.Message},{ex.StackTrace},{ex.Source}");
+            }
+        }
     }
 }
