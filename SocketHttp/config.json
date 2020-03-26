@@ -1,0 +1,15 @@
+﻿{
+  "IP": "s_auth.s-learning.cn", /* 服务器地址（支持域名） */
+  "PORT": "8003", /* 服务器端口 */
+  "PASSWORD": "200318", /* 默认密码 */
+  "CONCURRENT": "10000", /* 最大并行度 */
+  "TIMEOUT": "10", /* 响应超时时间（秒） */
+  "ACCOUNTFILE": "account.txt", /* 测试账号文件 */
+  "ACCOUNTDETAILFILE": "accountdetail.txt", /* 测试账号文件 */
+  "TIMETABLEID": "1112-555-8888", /* 课表ID */
+  "CLASSID": "1112-555-8888", /* 课程ID */
+  "MQIP": "mq.s-learning.cn", /* MQ IP */
+  "MQPORT": "5671", /* MQ PORT */
+  "MQUSERNAME": "guest", /* MQ USER NAME */
+  "MQPASSWORD": "guest" /* MQ PASSWORD */
+}

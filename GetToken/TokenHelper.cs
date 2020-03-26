@@ -17,7 +17,9 @@ namespace qiyubrother
         public static string GetToken(string ip, string port, string account, string pwd, int timeout = 10, object tag = null)
         {
             LogHelper.Trace($"[B]Account:{account}, Tag:{tag}");
+            LogHelper.Trace($"[B]GetCode:{account}, Tag:{tag}");
             GetCode(ip, port, account, pwd, out string code, out string state, tag);
+            LogHelper.Trace($"[E]GetCode:{account}, Tag:{tag}");
             var rtn = code == string.Empty ? string.Empty : GetToken(ip, port, account, code, state, "authorization_code", timeout, tag);
             LogHelper.Trace($"[E]Account:{account}, Tag:{tag}, AccessToken:{rtn}");
 
@@ -30,7 +32,8 @@ namespace qiyubrother
             try
             {
                 var url = $"http://{ip}:{port}/oauth2/login.html?client_id=1&response_type=code&username={account}&password={pwd}";
-                s = HttpPost(url, string.Empty);
+                //var url = $"http://www.baidu.com";
+                s = HttpPostAsync(url, string.Empty).Result;
                 JObject jo = (JObject)JsonConvert.DeserializeObject(s);
                 if (jo["msgCode"].ToString() == "200")
                 {
@@ -59,6 +62,13 @@ namespace qiyubrother
             catch (IOException ioe)
             {
                 LogHelper.Trace($"[Tag:{tag}][GetCode][IOException]:{ioe.Message}, {ioe.InnerException}");
+                code = string.Empty;
+                state = string.Empty;
+            }
+            catch (JsonReaderException jre)
+            {
+                //LogHelper.Trace($"[Tag:{tag}][GetCode][Rtn]{s}");
+                LogHelper.Trace($"[Tag:{tag}][GetCode][JsonReaderException]:{jre.Message}, {jre.InnerException}");
                 code = string.Empty;
                 state = string.Empty;
             }
@@ -103,6 +113,7 @@ namespace qiyubrother
                     {"state", state},
                     {"grant_type",grantType}
                 };
+
                 var httpContent = new FormUrlEncodedContent(param);
                 try
                 {
@@ -112,7 +123,6 @@ namespace qiyubrother
 
                     JObject jot = (JObject)JsonConvert.DeserializeObject(responseValue);
                     string err_code = jot["err_code"].ToString();
-                    //LogHelper.Trace($"[RTN]err_code={err_code}");
                     if (err_code == "200")
                     {
                         //LogHelper.Trace($"access_token:{jot["access_token"]}...");
@@ -159,27 +169,37 @@ namespace qiyubrother
         }
 
         //POST方法
-        public static string HttpPost(string Url, string postDataStr)
+        public static async Task<string> HttpPostAsync(string Url, string postDataStr)
         {
             //try
             {
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url);
+                request.KeepAlive = false;
+                //request.Proxy = null;
+                request.ServicePoint.ConnectionLimit = 10000;
+                request.ServicePoint.UseNagleAlgorithm = false;
+                request.AllowWriteStreamBuffering = false;
+                //request.ServicePoint.Expect100Continue = false;
+
+
                 request.Method = "POST";
                 request.ContentType = "application/x-www-form-urlencoded";
                 Encoding encoding = Encoding.UTF8;
                 byte[] postData = encoding.GetBytes(postDataStr);
                 request.ContentLength = postData.Length;
-                Stream myRequestStream = request.GetRequestStream();
+                var myRequestStream = request.GetRequestStream();
                 myRequestStream.Write(postData, 0, postData.Length);
                 myRequestStream.Close();
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                Stream myResponseStream = response.GetResponseStream();
-                StreamReader myStreamReader = new StreamReader(myResponseStream, encoding);
-                string retString = myStreamReader.ReadToEnd();
-                myStreamReader.Close();
-                myResponseStream.Close();
+                using (var response = await request.GetResponseAsync() as HttpWebResponse) // 慢
+                {
+                    Stream myResponseStream = response.GetResponseStream();
+                    StreamReader myStreamReader = new StreamReader(myResponseStream, encoding);
+                    string retString = myStreamReader.ReadToEnd();
+                    myStreamReader.Close();
+                    myResponseStream.Close();
 
-                return retString;
+                    return retString;
+                }
             }
             //catch (System.Net.WebException we)
             //{

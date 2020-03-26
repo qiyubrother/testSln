@@ -16,23 +16,23 @@ namespace ConsoleNetCoreTest
                 {
                     ()=>{
                         Console.WriteLine($"Counter:{counter++}");
-                        TokenHelper.HttpPost($"http://localhost:5000/api/Values", string.Empty);
+                        TokenHelper.HttpPostAsync($"http://localhost:5000/api/Values", string.Empty);
                     },
                     ()=>{
                         Console.WriteLine($"Counter:{counter++}");
-                        TokenHelper.HttpPost($"http://localhost:5000/api/Values", string.Empty);
+                        TokenHelper.HttpPostAsync($"http://localhost:5000/api/Values", string.Empty);
                     },
                     ()=>{
                         Console.WriteLine($"Counter:{counter++}");
-                        TokenHelper.HttpPost($"http://localhost:5000/api/Values", string.Empty);
+                        TokenHelper.HttpPostAsync($"http://localhost:5000/api/Values", string.Empty);
                     },
                     ()=>{
                         Console.WriteLine($"Counter:{counter++}");
-                        TokenHelper.HttpPost($"http://localhost:5000/api/Values", string.Empty);
+                        TokenHelper.HttpPostAsync($"http://localhost:5000/api/Values", string.Empty);
                     },
                     ()=>{
                         Console.WriteLine($"Counter:{counter++}");
-                        TokenHelper.HttpPost($"http://localhost:5000/api/Values", string.Empty);
+                        TokenHelper.HttpPostAsync($"http://localhost:5000/api/Values", string.Empty);
                     },
 
                 }); ;

@@ -15,7 +15,7 @@ namespace qiyubrother
         static ConcurrentQueue<string> queue = new ConcurrentQueue<string>();
         private static bool _enable = false;
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
-        private static extern void OutputDebugString(string message);
+        public static extern void OutputDebugString(string message);
 
         /// <summary>
         /// 控制台输出字符串
@@ -50,7 +50,7 @@ namespace qiyubrother
         public static void Trace(string s, params object[] param)
         {
             var p = param == null || param.Length == 0 ? new[] { "" } : param;
-            var str = $"[{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff")}]";
+            var str = $"[{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff")}][{Thread.CurrentThread.ManagedThreadId.ToString("000")}]";
             if (param == null || param.Length == 0)
             {
                 str = str + s;
@@ -78,8 +78,9 @@ namespace qiyubrother
                         {
                             try
                             {
-                                var fn = Path.Combine(Environment.CurrentDirectory, $"Log-{DateTime.Now.Year}{DateTime.Now.Month.ToString().PadLeft(2, '0')}{DateTime.Now.Day.ToString().PadLeft(2, '0')}.log");
-                                File.AppendAllLines(fn, new[] { item });
+                                //var fn = Path.Combine(Environment.CurrentDirectory, $"Log-{DateTime.Now.Year}{DateTime.Now.Month.ToString().PadLeft(2, '0')}{DateTime.Now.Day.ToString().PadLeft(2, '0')}.log");
+                                //File.AppendAllLines(fn, new[] { item });
+                                //Console.WriteLine(item);
                                 OutputDebugString(item);
                                 break;
                             }

@@ -2,7 +2,7 @@
   "IP": "app.s-learning.cn", /* 服务器地址（支持域名） */
   "PORT": "8003", /* 服务器端口 */
   "PASSWORD": "200318", /* 默认密码 */
-  "CONCURRENT": "10", /* 最大并行度 */
+  "CONCURRENT": "1000", /* 最大并行度 */
   "TIMEOUT": "10", /* 响应超时时间（秒） */
   "ACCOUNTFILE": "account.txt" /* 测试账号文件 */
 }
