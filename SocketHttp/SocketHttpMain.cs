@@ -24,8 +24,7 @@ namespace SocketHttp
             var ip = CodeHelper.GetIP(jo["IP"].ToString());
             var port = jo["PORT"].ToString();
             var pwd = TokenHelper.Md5(jo["PASSWORD"].ToString());
-            var concurrent = Convert.ToInt32(jo["CONCURRENT"].ToString());   // 最大并发度
-            var timeout = Convert.ToInt32(jo["TIMEOUT"].ToString());  // 最长等待响应时间（秒）
+            var numberOfRuns = Convert.ToInt32(jo["NUMBEROFRUNS"].ToString());   // 最大运行次数
             var accountFile = jo["ACCOUNTFILE"].ToString();
             var accountDetailFile = jo["ACCOUNTDETAILFILE"].ToString();
             var timeTableId = jo["TIMETABLEID"].ToString();
@@ -38,7 +37,7 @@ namespace SocketHttp
             var mqUserName = jo["MQUSERNAME"].ToString();
             var mqPassword = jo["MQPASSWORD"].ToString();
             var serverExchangeName = jo["SERVEREXCHANGENAME"].ToString();
-            var maxDegreeOfParallelism = Convert.ToInt32(jo["MaxDegreeOfParallelism"].ToString());
+            //var maxDegreeOfParallelism = Convert.ToInt32(jo["CONCURRENT"].ToString());
             MQHelper.CreateMqConnection(mqIp, mqPort, mqUserName, mqPassword);
             ConcurrentDictionary<string, string> cd = new ConcurrentDictionary<string, string>();
             BlockingCollection<MData> bc = new BlockingCollection<MData>();
@@ -52,15 +51,15 @@ namespace SocketHttp
             }
 
             var r = new Random((int)DateTime.Now.ToFileTimeUtc());
-            var accountIndexArray = new int[concurrent];
-            for(var i = 0; i < concurrent; i++)
+            var accountIndexArray = new int[numberOfRuns];
+            for(var i = 0; i < numberOfRuns; i++)
             {
                 accountIndexArray[i] = r.Next(0, accounts.Length - 1);
             }
 
-            var taskList = new Task[concurrent];
+            var taskList = new Task[numberOfRuns];
             var startDateTime = $"[{ DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff")}]";
-            for (var i = 0; i < concurrent; i++)
+            for (var i = 0; i < numberOfRuns; i++)
             {
                 int k = i;
                 taskList[i] = new Task(() =>
@@ -115,10 +114,11 @@ namespace SocketHttp
             }
             Console.WriteLine($"[{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff")}]开始获取Code、AccessToken...");
             taskList.ToList().ForEach(a => a.Start());
+            //Parallel.For(0, taskList.Length, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism }, i => { taskList[i].Start(); });
 
             Task.WaitAll(taskList, 1000 * 60 * 10); // 最长等待10分钟
-
-            #region 并发测试MQ(考勤)
+#if false
+#region 并发测试MQ(考勤)
             var bcTaskList = bc.ToList();
             var mqKaoQinTask = new Task[bcTaskList.Count];
             for (var i = 0; i < bcTaskList.Count; i++)
@@ -141,13 +141,12 @@ namespace SocketHttp
             };
             Console.WriteLine($"[{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff")}]开始并发测试MQ（考勤）...");
             mqKaoQinTask.ToList().ForEach(a => a.Start());
-            // 设置最大并行度
-            //Parallel.For(0, mqKaoQinTask.Length, new ParallelOptions { MaxDegreeOfParallelism = 8 }, i => { mqKaoQinTask[i].Start(); });
+            //Parallel.For(0, mqKaoQinTask.Length, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism }, i => { mqKaoQinTask[i].Start(); });
 
             Task.WaitAll(mqKaoQinTask, 1000 * 60 * 5); // 最长等待5分钟
-            #endregion
+#endregion
 
-            #region 并发测试MQ(举手发言)
+#region 并发测试MQ(举手发言)
             var mqJuShouFaYanTask = new Task[bcTaskList.Count];
             for (var i = 0; i < bcTaskList.Count; i++)
             {
@@ -168,11 +167,12 @@ namespace SocketHttp
             };
             Console.WriteLine($"[{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff")}]开始并发测试MQ（举手发言）...");
             mqJuShouFaYanTask.ToList().ForEach(a => a.Start());
+            //Parallel.For(0, mqJuShouFaYanTask.Length, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism }, i => { mqJuShouFaYanTask[i].Start(); });
 
             Task.WaitAll(mqJuShouFaYanTask, 1000 * 60 * 5); // 最长等待5分钟
-            #endregion
+#endregion
 
-            #region 并发测试MQ（回答问题）
+#region 并发测试MQ（回答问题）
             var mqHuiDaWenTiTask = new Task[bcTaskList.Count];
             for (var i = 0; i < bcTaskList.Count; i++)
             {
@@ -197,10 +197,12 @@ namespace SocketHttp
             };
             Console.WriteLine($"[{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff")}]开始并发测试MQ（回答问题）...");
             mqHuiDaWenTiTask.ToList().ForEach(a => a.Start());
+            //Parallel.For(0, mqHuiDaWenTiTask.Length, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism }, i => { mqHuiDaWenTiTask[i].Start(); });
 
             Task.WaitAll(mqHuiDaWenTiTask, 1000 * 60 * 5); // 最长等待5分钟
-            #endregion
-            var s = $"{startDateTime} - [{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff")}], Concurrent:{concurrent}, MQ-Concurrent:{taskList.Length}. Task finished. Press enter to exit.";
+#endregion
+#endif
+            var s = $"Run from {startDateTime} to [{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff")}], 总运行次数:{numberOfRuns}. All of task finished. Press enter to exit.";
             LogHelper.OutputDebugString(s);
             Console.WriteLine(s);
             Console.ReadLine();

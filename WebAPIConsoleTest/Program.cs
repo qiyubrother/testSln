@@ -60,7 +60,6 @@ namespace WebAPIConsoleTest
             //生成代理实例，并调用方法
             assembly = resource_cr.CompiledAssembly;
 
-
             var r = new Random((int)DateTime.Now.ToFileTimeUtc());
             var counter = 0;
             Parallel.For(0, 10000, new Action<int>((i) => {

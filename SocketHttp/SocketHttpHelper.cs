@@ -34,6 +34,7 @@ namespace qiyubrother
             IPEndPoint hostEP = new IPEndPoint(ip, Convert.ToInt32(port));
             //创建Socket 实例
             Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            //socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 60000); // 设置最大接收时间
             try
             {
                 //尝试连接
