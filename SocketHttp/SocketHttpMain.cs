@@ -59,6 +59,7 @@ namespace SocketHttp
 
             var taskList = new Task[numberOfRuns];
             var startDateTime = $"[{ DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff")}]";
+            
             for (var i = 0; i < numberOfRuns; i++)
             {
                 int k = i;
@@ -110,17 +111,21 @@ namespace SocketHttp
                         }
                         catch { }
                     }
+                    
                 });
+                
             }
+            
             Console.WriteLine($"[{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff")}]开始获取Code、AccessToken...");
             taskList.ToList().ForEach(a => a.Start());
             //Parallel.For(0, taskList.Length, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism }, i => { taskList[i].Start(); });
 
             Task.WaitAll(taskList, 1000 * 60 * 10); // 最长等待10分钟
-#if false
+#if true
 #region 并发测试MQ(考勤)
             var bcTaskList = bc.ToList();
             var mqKaoQinTask = new Task[bcTaskList.Count];
+            
             for (var i = 0; i < bcTaskList.Count; i++)
             {
                 var k = i;

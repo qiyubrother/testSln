@@ -44,6 +44,10 @@ namespace qiyubrother
                                          autoDelete: false,
                                          arguments: null);
 
+                    //var args = new Dictionary<string, object>();
+                    //args.Add("x-message-ttl", 60000);
+                    //channel.QueueDeclare(queueName, false, false, false, args);
+
                     var body = Encoding.UTF8.GetBytes(msg);
 
                     var properties = channel.CreateBasicProperties();

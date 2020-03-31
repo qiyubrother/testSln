@@ -227,7 +227,7 @@ namespace qiyubrother
             Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out Uri uri);
             var s = uri.IsAbsoluteUri ? uri.PathAndQuery : uri.OriginalString;
 
-            string sendStr = $"POST {s} HTTP/1.1{Environment.NewLine}Host: {hostName}{Environment.NewLine}Connection: keep-alive{Environment.NewLine}{Environment.NewLine}";
+            string sendStr = $"GET {s} HTTP/1.1{Environment.NewLine}Host: {hostName}{Environment.NewLine}Connection: close{Environment.NewLine}{Environment.NewLine}";
             //创建bytes字节数组以转换发送串
             byte[] bytesSendStr = new byte[1024];
             //将发送内容字符串转换成字节byte数组
