@@ -10,6 +10,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using qiyubrother;
+using System.Collections;
 
 namespace StudentLoginTest
 {
@@ -18,87 +20,72 @@ namespace StudentLoginTest
         static HttpWebRequest[] HttpWebRequestArray = null;
         static void Main(string[] args)
         {
+            var cfg = File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "config.json"));
+            JObject jo = (JObject)JsonConvert.DeserializeObject(cfg);
 
-            qiyubrother.LogHelper.StartService();
-            try
+            LogHelper.StartService();
+            
+            var classId = "AAAA-BBBB-CCCC-DDDD";
+            var timeTableId = "2019-2020-2021";
+            var accountId = "liuzhenhua";
+            var accessToken = "ACC-ESS-TOKEN-2020";
+            var T_T_T_BH = "DEMO-TTT-BH";
+            var url = jo["URL"].ToString();
+            var numberOfRuns = Convert.ToInt32(jo["NUMBEROFRUNS"].ToString());   // 最大运行次数
+            var mqIp = jo["MQIP"].ToString();
+            var mqPort = jo["MQPORT"].ToString();
+            var mqUserName = jo["MQUSERNAME"].ToString();
+            var mqPassword = jo["MQPASSWORD"].ToString();
+            Task[] mqKaoQinTask = new Task[numberOfRuns];
+            MQHelper.CreateMqConnection(mqIp, mqPort, mqUserName, mqPassword);
+
+            bool isExitTask = false;
+            for (var i = 0; i < numberOfRuns; i++)
             {
-                System.Net.ServicePointManager.DefaultConnectionLimit = 50000;
-                var cfg = File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "config.json"));
-                JObject jo = (JObject)JsonConvert.DeserializeObject(cfg);
+                var k = i;
+                mqKaoQinTask[i] = new Task(() => {
 
-                var ip = CodeHelper.GetIP(jo["IP"].ToString());
-                var port = jo["PORT"].ToString();
-                var pwd = TokenHelper.Md5(jo["PASSWORD"].ToString());
-                var len = Convert.ToInt32(jo["CONCURRENT"].ToString());   // 最大并发度
-                var timeout = Convert.ToInt32(jo["TIMEOUT"].ToString());  // 最长等待响应时间（秒）
-                var accountFile = jo["ACCOUNTFILE"].ToString();
+                    // 获取上课信息
+                    string[] param = new string[] { accountId, "21", accessToken };
 
-                ip = CodeHelper.GetIP("s_auth.s-learning.cn");
-
-                var accounts = File.ReadAllLines(Path.Combine(Environment.CurrentDirectory, accountFile));
-
-                if (len > accounts.Length)
-                {
-                    len = accounts.Length;
-                }
-
-                var _ = $"[{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff")}]Task begin. IP:{ip}, PORT:{port}, PASSWORD:{jo["PASSWORD"]}, CONCURRENT:{len}, TIMEOUT:{timeout}";
-                LogHelper.Trace(_);
-                Console.WriteLine(_);
-
-                //var taskList = new Task[len];
-                //for (var i = 0; i < len; i++)
-                //{
-                //    int k = i;
-                //    taskList[i] = new Task(() => TokenHelper.GetToken(ip, port, accounts[k], pwd, timeout, k));
-                //}
-                ////taskList.ToList().ForEach(a => a.Start());
-
-                //for (var j = 0; j < len; j++)
-                //{
-                //    //TokenHelper.GetToken(ip, port, accounts[j], pwd, timeout, j);
-                //    taskList[j].Start();
-                //    //taskList[j].Wait();
-                //}
-                //Task.WaitAll(taskList);
-
-                var ths = new Thread[len];
-                for (var j = 0; j < len; j++)
-                {
-                    var k = j;
-                    ths[j] = new Thread(new ThreadStart(() =>TokenHelper.GetToken(ip, port, accounts[k], pwd, timeout, k)));
-                }
-                //for (var j = 0; j < len; j++)
-                //{
-                //    ths[j].Start();
-                //}
-                ths.ToList().ForEach(a => a.Start());
-                bool isAllOK = true;
-                do
-                {
-                    isAllOK = true;
-                    for (var i = 0; i < len; i++)
-                    {
-                        if (ths[i].IsAlive)
-                        {
-                            isAllOK = false;
-                            break;
-                        }
-                    }
-                    Thread.Sleep(50);
-                } while (!isAllOK);
-                var s = $"[{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff")}]Task finished. Press enter to exit.";
-                qiyubrother.LogHelper.Trace(s);
-                //Console.WriteLine(s);
-                //Console.ReadLine();
-            }
-            catch(Exception ex)
+                    LogHelper.Trace($"param::accountId:{param[0]},applicationType:{param[1]},accessToken:{param[2]}");
+                    var s = WebServiceHelper.CallMethod(url, "getCourseInfoWhenStudentLoginInfo", param);
+                    LogHelper.Trace(s);
+                    // 考勤
+                    var jObj = new JObject();
+                    jObj.Add(new JProperty("studentAccountId", accountId));
+                    jObj.Add(new JProperty("timeTableId", timeTableId));
+                    jObj.Add(new JProperty("wifiName", "Wifi-liuzhenhua"));
+                    jObj.Add(new JProperty("checkWorkStatus", "2"));
+                    jObj.Add(new JProperty("checkWorkTime", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")));
+                    jObj.Add(new JProperty("classId", classId));
+                    jObj.Add(new JProperty("tocken", accessToken));
+                    var jsonPostData = jObj.ToString();
+                    LogHelper.OutputDebugString($"MQ::{jsonPostData}");
+                    MQHelper.sentMsgToMQqueue("checkwork", jsonPostData);
+                });
+            };
+            Console.WriteLine($"[{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff")}]开始并发测试MQ（考勤）...");
+            mqKaoQinTask.ToList().ForEach(a => a.Start());
+            #region 考勤统计
+            Task.Run(() =>
             {
-                LogHelper.Trace(ex.ToString());
-                Console.WriteLine($"Exception. Press enter to exit.");
-                Console.WriteLine(ex.ToString());
-                Console.ReadLine();
-            }
+                while (!isExitTask)
+                {
+                    string method2 = "getCheckWorkStatistics";
+                    string[] param2 = new string[] { timeTableId, T_T_T_BH, accessToken };
+                    LogHelper.Trace("param::timeTableId:{0},T_T_T_BH:{1},token:{2}", param2[0], param2[1], param2[2]);
+                    var s2 = WebServiceHelper.CallMethod(url, method2, param2);
+                    LogHelper.Trace(s2);
+                    LogHelper.Trace("Sleep 5000 ms.");
+                    Thread.Sleep(5000);
+                }
+            });
+            #endregion
+            Task.WaitAll(mqKaoQinTask, 1000 * 60 * 5); // 最长等待5分钟
+            isExitTask = true;
+            Console.WriteLine($"[{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff")}]完成...");
+            LogHelper.Stop();
         }
     }
 }
