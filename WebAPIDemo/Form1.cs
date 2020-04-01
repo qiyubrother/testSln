@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -20,9 +21,13 @@ namespace WebAPIDemo
 
         private void button1_Click(object sender, EventArgs e)
         {
-            SocketHttpHelper.SocketHttpPost("localhost", "5000", "/api/values", "value=100", out string status, out string data);
+            //SocketHttpHelper.SocketHttpPost("localhost", "5000", "/api/values", "value=100", out string status, out string data);
 
-            Text = status;
+            //Text = status;
+
+            //ProcessStartInfo psi = new ProcessStartInfo();
+            //psi.FileName = @"D:\GreenApps\KillProcess.exe";
+            //System.Diagnostics.Process.Start(psi);
         }
     }
 }
