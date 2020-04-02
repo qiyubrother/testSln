@@ -180,7 +180,8 @@ namespace qiyubrother
                 request.ServicePoint.UseNagleAlgorithm = false;
                 request.AllowWriteStreamBuffering = false;
                 //request.ServicePoint.Expect100Continue = false;
-
+                
+                request.Timeout = 3000;
 
                 request.Method = "POST";
                 request.ContentType = "application/x-www-form-urlencoded";
