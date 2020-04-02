@@ -25,9 +25,9 @@ namespace StudentLoginTest
 
             LogHelper.StartService();
             
-            var classId = "AAAA-BBBB-CCCC-DDDD";
-            var timeTableId = "2019-2020-2021";
-            var accountId = "liuzhenhua";
+            var classId = "64c01042e1e64d23812768196ff012f6";
+            var timeTableId = "30b35e08dab04a5a88198b3ccb4cac73";
+            var accountId = "li_003";
             var accessToken = "ACC-ESS-TOKEN-2020";
             var T_T_T_BH = "DEMO-TTT-BH";
             var url = jo["URL"].ToString();
@@ -39,6 +39,8 @@ namespace StudentLoginTest
             Task[] mqKaoQinTask = new Task[numberOfRuns];
             MQHelper.CreateMqConnection(mqIp, mqPort, mqUserName, mqPassword);
 
+            var wsObj = WebServiceHelper.GetObject(url);
+
             bool isExitTask = false;
             for (var i = 0; i < numberOfRuns; i++)
             {
@@ -49,7 +51,8 @@ namespace StudentLoginTest
                     string[] param = new string[] { accountId, "21", accessToken };
 
                     LogHelper.Trace($"param::accountId:{param[0]},applicationType:{param[1]},accessToken:{param[2]}");
-                    var s = WebServiceHelper.CallMethod(url, "getCourseInfoWhenStudentLoginInfo", param);
+                    //var s = WebServiceHelper.CallMethod(url, "getCourseInfoWhenStudentLoginInfo", param);
+                    var s = WebServiceHelper.CallMethod(wsObj, "getCourseInfoWhenStudentLoginInfo", param);
                     LogHelper.Trace(s);
                     // 考勤
                     var jObj = new JObject();
