@@ -1,0 +1,6 @@
+﻿{
+  "MQIP": "mq.s-learning.cn", /* MQ IP */
+  "MQPORT": "5671", /* MQ PORT */
+  "MQUSERNAME": "guest", /* MQ USER NAME */
+  "MQPASSWORD": "guest" /* MQ PASSWORD */
+}

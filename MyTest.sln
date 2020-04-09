@@ -45,6 +45,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClearSqlComment", "ClearSql
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GetAccessToken", "GetAccessToken\GetAccessToken.csproj", "{9308F56D-F2FC-43C2-9FBA-35280A6FAE2A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Student-answerQuestionStudent", "Student-answerQuestionStudent", "{E2E0D628-D348-4161-A473-C9AF4D6C132C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnswerQuestionStudentTest", "AnswerQuestionStudentTest\AnswerQuestionStudentTest.csproj", "{F1D59668-1359-4F92-8317-643A1F94B84E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -123,6 +127,10 @@ Global
 		{9308F56D-F2FC-43C2-9FBA-35280A6FAE2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9308F56D-F2FC-43C2-9FBA-35280A6FAE2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9308F56D-F2FC-43C2-9FBA-35280A6FAE2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1D59668-1359-4F92-8317-643A1F94B84E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1D59668-1359-4F92-8317-643A1F94B84E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1D59668-1359-4F92-8317-643A1F94B84E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1D59668-1359-4F92-8317-643A1F94B84E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -131,6 +139,8 @@ Global
 		{205B2078-4A6A-4588-9163-F6EED1A19052} = {14395DA6-6F4D-463C-BB2C-3662AEE23CCB}
 		{1F4534CF-4AD9-46C4-B535-1DB93D2C8AA1} = {14395DA6-6F4D-463C-BB2C-3662AEE23CCB}
 		{E367CAFE-57DE-4079-967F-FFFDAEB5E53F} = {205B2078-4A6A-4588-9163-F6EED1A19052}
+		{E2E0D628-D348-4161-A473-C9AF4D6C132C} = {14395DA6-6F4D-463C-BB2C-3662AEE23CCB}
+		{F1D59668-1359-4F92-8317-643A1F94B84E} = {E2E0D628-D348-4161-A473-C9AF4D6C132C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A3302128-7F76-4B36-9C49-5E742B24D69B}

@@ -78,10 +78,9 @@ namespace qiyubrother
                         {
                             try
                             {
-                                //var fn = Path.Combine(Environment.CurrentDirectory, $"Log-{DateTime.Now.Year}{DateTime.Now.Month.ToString().PadLeft(2, '0')}{DateTime.Now.Day.ToString().PadLeft(2, '0')}.log");
-                                //File.AppendAllLines(fn, new[] { item });
-                                //Console.WriteLine(item);
-                                OutputDebugString(item);
+                                Parallel.Invoke(() => OutputDebugString(item));
+                                var fn = Path.Combine(Environment.CurrentDirectory, $"Log-{DateTime.Now.Year}{DateTime.Now.Month.ToString().PadLeft(2, '0')}{DateTime.Now.Day.ToString().PadLeft(2, '0')}.log");
+                                File.AppendAllLines(fn, new[] { item });
                                 break;
                             }
                             catch
@@ -103,6 +102,7 @@ namespace qiyubrother
                             }
                         } while (true);
                     }
+
                     System.Threading.Thread.Sleep(10);
                 }
             }));
