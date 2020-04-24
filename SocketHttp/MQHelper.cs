@@ -76,7 +76,7 @@ namespace qiyubrother
                     //使用topic exchange type，指定exchange名称
                     channel.ExchangeDeclare(exchange: serverExchangeName, type: "topic");
                     var body = Encoding.UTF8.GetBytes(msg);
-                    LogHelper.Trace($"发送MQ消息:{serverExchangeName}:{routingKey}>>>\n{msg}");
+                    // LogHelper.Trace($"发送MQ消息:{serverExchangeName}:{routingKey}>>>\n{msg}");
                     channel.BasicPublish(exchange: serverExchangeName, routingKey: routingKey, basicProperties: null, body: body);
                 }
             }

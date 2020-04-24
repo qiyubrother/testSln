@@ -1,6 +1,8 @@
 ﻿{
-  "MQIP": "mq.s-learning.cn", /* MQ IP */
-  "MQPORT": "5671", /* MQ PORT */
+  "MQIP": "192.168.10.168", /* MQ IP */
+  "MQPORT": "5672", /* MQ PORT */
   "MQUSERNAME": "guest", /* MQ USER NAME */
-  "MQPASSWORD": "guest" /* MQ PASSWORD */
+  "MQPASSWORD": "guest", /* MQ PASSWORD */
+  "TIMETABLEID": "8583dee986924769a59dffc84144da3b", /* 课表ID */
+  "COURSEID": "4498c4d941c94f08a5b51d91e9f68bc6" /* Course_ID */
 }

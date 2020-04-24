@@ -30,6 +30,11 @@ namespace AnswerQuestionStudentTest
             var mqPort = jo["MQPORT"].ToString();
             var mqUserName = jo["MQUSERNAME"].ToString();
             var mqPassword = jo["MQPASSWORD"].ToString();
+            var timeTableId = jo["TIMETABLEID"].ToString();
+            var courseId = jo["COURSEID"].ToString();
+
+            var detailIds = RemoveEmptyLines(File.ReadAllLines(Path.Combine(Environment.CurrentDirectory, "detailIds.txt")));
+
 
             var connection = MQHelper.CreateMqConnection(mqIp, mqPort, mqUserName, mqPassword);
 
@@ -51,18 +56,30 @@ namespace AnswerQuestionStudentTest
                     lstTask[k] = new Task(() =>
                     {
                         var j = new JObject();
-                        var jItem = new JObject();
-                        jItem["Publish_Details_ID"] = resourceIds[rIndex].ResourceDetailId;
-                        jItem["StudentAnswer"] = "B";
-                        jItem["RightOrWrong"] = 0;
-                        jItem["Sort"] = 1;
+
+                        var resource_detailIds = new string[detailIds.Length];//detailIds;
+                        for (var c = 0; c < detailIds.Length; c++)
+                        {
+                            var h = c;
+                            resource_detailIds[h] = detailIds[h];
+                        }
                         var jArray = new JArray();
-                        jArray.Add(jItem);
+                        for(var i = 0; i < resource_detailIds.Length; i++)
+                        {
+                            var jItem = new JObject();
+                            var w = i;
+                            jItem["Publish_Details_ID"] = resource_detailIds[w];// resourceIds[rIndex].ResourceDetailId;
+                            jItem["StudentAnswer"] = "B";
+                            jItem["RightOrWrong"] = 0;
+                            jItem["Sort"] = w + 1;
+                            jArray.Add(jItem);
+                        }
+
                         j["AnswerList"] = jArray;
                         j["ErrorNo"] = "1";
-                        j["Time_Table_ID"] = "7a6177f3980848ef81f1a6355f83cb4c"; // "a9731c294ac7405dab551e69e93d6941";
+                        j["Time_Table_ID"] = timeTableId; // "a9731c294ac7405dab551e69e93d6941";
                         j["Resource_ID"] = resourceIds[rIndex].ResourceId;
-                        j["Course_ID"] = "33de65df44004ec49059a929a62d1979";
+                        j["Course_ID"] = courseId;
                         j["Account_ID"] = accountIds[aIndex];
                         j["Answer_Time"] = "2020-4-8 16:41:07";
                         j["type"] = "1";
@@ -114,7 +131,15 @@ namespace AnswerQuestionStudentTest
             foreach(var line in lines)
             {
                 var items = line.Split(' ');
-                lst.Add(new ResourceData { ResourceId = items[0], ResourceDetailId = items[1] });
+                if (items.Length == 1)
+                {
+                    lst.Add(new ResourceData { ResourceId = items[0], ResourceDetailId = string.Empty });
+                }
+                else
+                {
+                    lst.Add(new ResourceData { ResourceId = items[0], ResourceDetailId = items[1] });
+                }
+
             }
 
             return lst.ToArray();
